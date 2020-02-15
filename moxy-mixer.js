@@ -67,13 +67,13 @@ var mix = function (js) {
     js =
         "const " + cs[tokens.length] + " = (s) => s[" + cs[tokens.length + 1] + "(\"%72%65%70%6c%61%63%65\")](/\\x([0-9a-f]{2})/g, (_, _p) => String[" + cs[tokens.length + 1] + "(\"%66%72%6f%6d%43%68%61%72%43%6f%64%65\")](parseInt(_p, 16)))\n" + js;
     // Final replace to minify
-    return js;
-    // .replace(/\t/g, '')
-    // .replace(/\r\n/g, '\n')
-    // .replace(/{\n/g, '{')
-    // .replace(/}\n/g, '}')
-    // .replace(/\n/g, ';')
-    // .replace(/;;/g, ';')
+    return js
+        .replace(/\t/g, '')
+        .replace(/\r\n/g, '\n')
+        .replace(/{\n/g, '{')
+        .replace(/}\n/g, '}')
+        .replace(/\n/g, ';')
+        .replace(/;;/g, ';');
 };
 // tslint:disable: quotemark
 var processToken = function (token, r, js) {

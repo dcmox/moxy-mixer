@@ -79,12 +79,12 @@ const mix = (js: string) => {
 
 	// Final replace to minify
 	return js
-	// .replace(/\t/g, '')
-	// .replace(/\r\n/g, '\n')
-	// .replace(/{\n/g, '{')
-	// .replace(/}\n/g, '}')
-	// .replace(/\n/g, ';')
-	// .replace(/;;/g, ';')
+		.replace(/\t/g, '')
+		.replace(/\r\n/g, '\n')
+		.replace(/{\n/g, '{')
+		.replace(/}\n/g, '}')
+		.replace(/\n/g, ';')
+		.replace(/;;/g, ';')
 }
 // tslint:disable: quotemark
 const processToken = (token: any, r: string, js: string) => {
