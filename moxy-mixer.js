@@ -29,17 +29,24 @@ var mix = function (js) {
         }
         tokens.push({ value: match[1], type: 'var' });
     }
+    tokens.sort(function (a, b) { return (a.value.length > b.value.length ? -1 : 1); });
     // Replace globals like document|Object|console|window.method, eg: document.getElementById -> h
     var rg = new RegExp(REGEX_GLOBALS);
+    var tkg = [];
     while ((match = rg.exec(js)) !== null) {
         // console.log(match)
-        tokens.push({ value: match[0], type: 'fn' });
+        tkg.push({ value: match[0], type: 'fn' });
     }
+    tkg.sort(function (a, b) { return (a.value.length > b.value.length ? -1 : 1); });
+    tokens.push.apply(tokens, tkg);
     // Replace methods, eg. str.toString() -> str[x]()
     var rm = new RegExp(REGEX_METHODS);
+    var tk = [];
     while ((match = rm.exec(js)) !== null) {
-        tokens.push({ value: match[0], type: 'method' });
+        tk.push({ value: match[0], type: 'method' });
     }
+    tk.sort(function (a, b) { return (a.value.length > b.value.length ? -1 : 1); });
+    tokens.push.apply(tokens, tk);
     // Remove duplicates
     tokens = tokens.filter(function (t, i) {
         return tokens.findIndex(function (fi) { return fi.value === t.value; }) === i;
@@ -60,13 +67,13 @@ var mix = function (js) {
     js =
         "const " + cs[tokens.length] + " = (s) => s[" + cs[tokens.length + 1] + "(\"%72%65%70%6c%61%63%65\")](/\\x([0-9a-f]{2})/g, (_, _p) => String[" + cs[tokens.length + 1] + "(\"%66%72%6f%6d%43%68%61%72%43%6f%64%65\")](parseInt(_p, 16)))\n" + js;
     // Final replace to minify
-    return js
-        .replace(/\t/g, '')
-        .replace(/\r\n/g, '\n')
-        .replace(/{\n/g, '{')
-        .replace(/}\n/g, '}')
-        .replace(/\n/g, ';')
-        .replace(/;;/g, ';');
+    return js;
+    // .replace(/\t/g, '')
+    // .replace(/\r\n/g, '\n')
+    // .replace(/{\n/g, '{')
+    // .replace(/}\n/g, '}')
+    // .replace(/\n/g, ';')
+    // .replace(/;;/g, ';')
 };
 // tslint:disable: quotemark
 var processToken = function (token, r, js) {
