@@ -54,18 +54,44 @@ var mix = function (js) {
         var r = cs[i];
         js = processToken(token, r, js);
         if (token.type === 'fn') {
-            js = "const " + r + " = " + token.value + "\n" + js;
+            js = "const " + r + "=" + token.value + "\n" + js;
         }
         else if (token.type === 'method') {
-            js = "const " + r + " = '" + token.value.slice(1) + "'\n" + js;
+            js = "const " + r + "='" + token.value.slice(1) + "'\n" + js;
         }
     });
+    // Randomness
+    for (var times = 0; times < 3; times++) {
+        var bytes = '';
+        var bLength = Math.floor(Math.random() * 20) + 5;
+        for (var i = 0; i < bLength; i++) {
+            bytes += '\\x' + (Math.floor(Math.random() * 127) + 65).toString(16);
+        }
+        console.log('BYTES', bytes, cs[tokens.length + 3 + times]);
+        js = "const " + cs[tokens.length + 3 + times] + " = '" + bytes + "'\n" + js;
+    }
     // Replace strings with hex encoded values
     js = processToken(null, cs[tokens.length] + cs[tokens.length + 1], js);
-    js = "const " + cs[tokens.length + 1] + " = decodeURIComponent\n" + js;
-    js = "const " + cs[tokens.length + 2] + " = document\n" + js;
+    js = "const " + cs[tokens.length + 1] + "=decodeURIComponent\n" + js;
+    js = "const " + cs[tokens.length + 2] + "=document\n" + js;
     js =
-        "const " + cs[tokens.length] + " = (s) => s[" + cs[tokens.length + 1] + "(\"%72%65%70%6c%61%63%65\")](/\\x([0-9a-f]{2})/g, (_, _p) => String[" + cs[tokens.length + 1] + "(\"%66%72%6f%6d%43%68%61%72%43%6f%64%65\")](parseInt(_p, 16)))\n" + js;
+        "const " + cs[tokens.length] + "=(s)=>s[" + cs[tokens.length + 1] + "(\"%72%65%70%6c%61%63%65\")](/\\x([0-9a-f]{2})/g,(_, _p)=>String[" + cs[tokens.length + 1] + "(\"%66%72%6f%6d%43%68%61%72%43%6f%64%65\")](parseInt(_p, 16)))\n" + js;
+    // Randomness
+    // for (const i = 0; i < ) {
+    var jsLines = js.split('\n');
+    var headers = 'const ';
+    for (var i = 0; i < tokens.length; i++) {
+        if (jsLines[i].startsWith('let ')) {
+            headers += jsLines[i].slice(4) + ',';
+        }
+        else if (jsLines[i].startsWith('const ')) {
+            headers += jsLines[i].slice(6) + ',';
+        }
+    }
+    js =
+        headers.slice(0, headers.length - 1) +
+            '\n' +
+            jsLines.slice(tokens.length).join('\n');
     // Final replace to minify
     return js
         .replace(/\t/g, '')
