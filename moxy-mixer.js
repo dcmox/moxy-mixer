@@ -21,10 +21,11 @@ var mix = function (js) {
     while ((match = r.exec(js)) !== null) {
         // console.log(match)
         if (match[1].length === 1) {
-            cs = cs.split('');
-            cs.splice(cs.indexOf(match[1]) + 1);
-            cs = cs.join('');
-            continue;
+            var idx = cs.indexOf(match[1]);
+            if (idx !== -1) {
+                cs = cs.slice(0, idx) + cs.slice(idx + 1);
+                continue;
+            }
         }
         tokens.push({ value: match[1], type: 'var' });
     }
@@ -33,7 +34,6 @@ var mix = function (js) {
     var rg = new RegExp(REGEX_GLOBALS);
     var tkg = [];
     while ((match = rg.exec(js)) !== null) {
-        console.log(match);
         tkg.push({ value: match[0], type: 'fn' });
     }
     tkg.sort(function (a, b) { return (a.value.length > b.value.length ? 1 : -1); });
