@@ -31,7 +31,7 @@ const mix = (js: string) => {
 		}
 		tokens.push({ value: match[1], type: 'var' })
 	}
-	tokens.sort((a: any, b: any) => (a.value.length > b.value.length ? -1 : 1))
+	// tokens.sort((a: any, b: any) => (a.value.length > b.value.length ? -1 : 1))
 
 	// Replace globals like document|Object|console|window.method, eg: document.getElementById -> h
 	const rg = new RegExp(REGEX_GLOBALS)
@@ -40,7 +40,7 @@ const mix = (js: string) => {
 		// console.log(match)
 		tkg.push({ value: match[0], type: 'fn' })
 	}
-	tkg.sort((a: any, b: any) => (a.value.length > b.value.length ? -1 : 1))
+	tkg.sort((a: any, b: any) => (a.value.length > b.value.length ? 1 : -1))
 	tokens.push(...tkg)
 
 	// Replace methods, eg. str.toString() -> str[x]()
@@ -79,12 +79,12 @@ const mix = (js: string) => {
 
 	// Final replace to minify
 	return js
-		.replace(/\t/g, '')
-		.replace(/\r\n/g, '\n')
-		.replace(/{\n/g, '{')
-		.replace(/}\n/g, '}')
-		.replace(/\n/g, ';')
-		.replace(/;;/g, ';')
+	// .replace(/\t/g, '')
+	// .replace(/\r\n/g, '\n')
+	// .replace(/{\n/g, '{')
+	// .replace(/}\n/g, '}')
+	// .replace(/\n/g, ';')
+	// .replace(/;;/g, ';')
 }
 // tslint:disable: quotemark
 const processToken = (token: any, r: string, js: string) => {
