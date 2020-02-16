@@ -14,7 +14,7 @@ const shuffle = (s: string) =>
 const mix = (js: string) => {
 	let tokens: any = []
 	// Randomize our charset for use
-	let cs: string = shuffle(CHARSET)
+	let cs: string | string[] = shuffle(CHARSET)
 
 	// Replace variables, eg: var message = 'test' -> var a = 'test' or function displayMessage -> function b
 	const r = new RegExp(REGEX_VARS)
@@ -23,10 +23,9 @@ const mix = (js: string) => {
 	while ((match = r.exec(js)) !== null) {
 		// console.log(match)
 		if (match[1].length === 1) {
-			cs = cs
-				.split('')
-				.splice(cs.indexOf(match[1]) + 1)
-				.join('')
+			cs = cs.split('')
+			cs.splice(cs.indexOf(match[1]) + 1)
+			cs = cs.join('')
 			continue
 		}
 		tokens.push({ value: match[1], type: 'var' })
@@ -62,7 +61,6 @@ const mix = (js: string) => {
 		const r = cs[i]
 		js = processToken(token, r, js)
 		if (token.type === 'fn') {
-			console.log(token.value)
 			js = `const ${r} = ${token.value}\n` + js
 		} else if (token.type === 'method') {
 			js = `const ${r} = '${token.value.slice(1)}'\n` + js

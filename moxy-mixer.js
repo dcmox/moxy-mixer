@@ -21,10 +21,9 @@ var mix = function (js) {
     while ((match = r.exec(js)) !== null) {
         // console.log(match)
         if (match[1].length === 1) {
-            cs = cs
-                .split('')
-                .splice(cs.indexOf(match[1]) + 1)
-                .join('');
+            cs = cs.split('');
+            cs.splice(cs.indexOf(match[1]) + 1);
+            cs = cs.join('');
             continue;
         }
         tokens.push({ value: match[1], type: 'var' });
@@ -55,7 +54,6 @@ var mix = function (js) {
         var r = cs[i];
         js = processToken(token, r, js);
         if (token.type === 'fn') {
-            console.log(token.value);
             js = "const " + r + " = " + token.value + "\n" + js;
         }
         else if (token.type === 'method') {
