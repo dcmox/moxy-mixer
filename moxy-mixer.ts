@@ -1,5 +1,5 @@
 const REGEX_VARS = /(?:let|var|const|function|class|get|set|static) ([_a-zA-Z0-9]+)/g
-const REGEX_GLOBALS = /(document|Object|console|window|String|Array)\.([a-zA-Z0-9_]+)/g
+const REGEX_GLOBALS = /(Object|console|window|String|Array)\.([a-zA-Z0-9_]+)/g
 const REGEX_METHODS = /\.([a-zA-Z0-9_]+)?/g
 const CHARSET = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
@@ -37,7 +37,7 @@ const mix = (js: string) => {
 	const rg = new RegExp(REGEX_GLOBALS)
 	const tkg = []
 	while ((match = rg.exec(js)) !== null) {
-		// console.log(match)
+		console.log(match)
 		tkg.push({ value: match[0], type: 'fn' })
 	}
 	tkg.sort((a: any, b: any) => (a.value.length > b.value.length ? 1 : -1))
@@ -62,6 +62,7 @@ const mix = (js: string) => {
 		const r = cs[i]
 		js = processToken(token, r, js)
 		if (token.type === 'fn') {
+			console.log(token.value)
 			js = `const ${r} = ${token.value}\n` + js
 		} else if (token.type === 'method') {
 			js = `const ${r} = '${token.value.slice(1)}'\n` + js
@@ -70,6 +71,7 @@ const mix = (js: string) => {
 	// Replace strings with hex encoded values
 	js = processToken(null, cs[tokens.length] + cs[tokens.length + 1], js)
 	js = `const ${cs[tokens.length + 1]} = decodeURIComponent\n` + js
+	js = `const ${cs[tokens.length + 2]} = document\n` + js
 	js =
 		`const ${cs[tokens.length]} = (s) => s[${
 			cs[tokens.length + 1]
@@ -79,12 +81,11 @@ const mix = (js: string) => {
 
 	// Final replace to minify
 	return js
-	// .replace(/\t/g, '')
-	// .replace(/\r\n/g, '\n')
-	// .replace(/{\n/g, '{')
-	// .replace(/}\n/g, '}')
-	// .replace(/\n/g, ';')
-	// .replace(/;;/g, ';')
+		.replace(/\t/g, '')
+		.replace(/\r\n/g, '\n')
+		.replace(/\n/g, ';')
+		.replace(/;;/g, ';')
+		.replace(/document\[/g, `${cs[tokens.length + 2]}[`)
 }
 // tslint:disable: quotemark
 const processToken = (token: any, r: string, js: string) => {

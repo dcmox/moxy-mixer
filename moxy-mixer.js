@@ -1,5 +1,5 @@
 var REGEX_VARS = /(?:let|var|const|function|class|get|set|static) ([_a-zA-Z0-9]+)/g;
-var REGEX_GLOBALS = /(document|Object|console|window|String|Array)\.([a-zA-Z0-9_]+)/g;
+var REGEX_GLOBALS = /(Object|console|window|String|Array)\.([a-zA-Z0-9_]+)/g;
 var REGEX_METHODS = /\.([a-zA-Z0-9_]+)?/g;
 var CHARSET = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
 var shuffle = function (s) {
@@ -34,7 +34,7 @@ var mix = function (js) {
     var rg = new RegExp(REGEX_GLOBALS);
     var tkg = [];
     while ((match = rg.exec(js)) !== null) {
-        // console.log(match)
+        console.log(match);
         tkg.push({ value: match[0], type: 'fn' });
     }
     tkg.sort(function (a, b) { return (a.value.length > b.value.length ? 1 : -1); });
@@ -55,6 +55,7 @@ var mix = function (js) {
         var r = cs[i];
         js = processToken(token, r, js);
         if (token.type === 'fn') {
+            console.log(token.value);
             js = "const " + r + " = " + token.value + "\n" + js;
         }
         else if (token.type === 'method') {
@@ -64,16 +65,16 @@ var mix = function (js) {
     // Replace strings with hex encoded values
     js = processToken(null, cs[tokens.length] + cs[tokens.length + 1], js);
     js = "const " + cs[tokens.length + 1] + " = decodeURIComponent\n" + js;
+    js = "const " + cs[tokens.length + 2] + " = document\n" + js;
     js =
         "const " + cs[tokens.length] + " = (s) => s[" + cs[tokens.length + 1] + "(\"%72%65%70%6c%61%63%65\")](/\\x([0-9a-f]{2})/g, (_, _p) => String[" + cs[tokens.length + 1] + "(\"%66%72%6f%6d%43%68%61%72%43%6f%64%65\")](parseInt(_p, 16)))\n" + js;
     // Final replace to minify
-    return js;
-    // .replace(/\t/g, '')
-    // .replace(/\r\n/g, '\n')
-    // .replace(/{\n/g, '{')
-    // .replace(/}\n/g, '}')
-    // .replace(/\n/g, ';')
-    // .replace(/;;/g, ';')
+    return js
+        .replace(/\t/g, '')
+        .replace(/\r\n/g, '\n')
+        .replace(/\n/g, ';')
+        .replace(/;;/g, ';')
+        .replace(/document\[/g, cs[tokens.length + 2] + "[");
 };
 // tslint:disable: quotemark
 var processToken = function (token, r, js) {
